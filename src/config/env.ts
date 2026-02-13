@@ -11,10 +11,10 @@ export const config = {
 
 // Validate required env vars
 if (!config.databaseUrl) {
-  console.error('❌ DATABASE_URL is not defined in .env file');
+  console.error('DATABASE_URL is not defined in .env file');
   process.exit(1);
 }
 
 if (!process.env.JWT_SECRET) {
-  console.warn('⚠️  JWT_SECRET not set, using default (not safe for production)');
+  console.warn('JWT_SECRET not set, using default (not safe for production)');
 }
