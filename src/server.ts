@@ -4,7 +4,7 @@ dotenv.config();
 import app from './app';
 import { connectDB, initDB } from './config/db';
 
-import { authRoute } from './modules/auth/auth.routes';
+import { authRoute } from './modules/auth/auth.routes';  
 import { userRoute } from './modules/users/user.routes';
 import { vehicleRoute } from './modules/vehicles/vehicle.routes';
 import { bookingRoute } from './modules/bookings/booking.routes';
