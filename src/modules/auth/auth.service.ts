@@ -24,12 +24,12 @@ export const createUserInDB = async (payload: CreateUserPayload) => {
     [payload.name, payload.email.toLowerCase(), hashedPassword, payload.phone, role] 
   );
 
-  return result.rows[0];
+  return result.rows[0]; 
 };
 
 export const loginUserIntoDB = async (email: string, password: string) => {
   const userQuery = await pool.query(
-    `SELECT * FROM users WHERE email=$1`,
+    `SELECT id, name, email, password, phone, role FROM users WHERE email=$1`,
     [email.toLowerCase()]
   );
 
