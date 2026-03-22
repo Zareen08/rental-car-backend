@@ -4,7 +4,7 @@ import { authController } from "./auth.controller";
 const router = Router();
 
 router.post("/signup", authController.createUser);
-router.post("/login", authController.loginUser);
+router.post("/signin", authController.loginUser);
 
 // TEMPORARY
 router.get("/signup", (req, res) => {
@@ -14,7 +14,7 @@ router.get("/signup", (req, res) => {
   });
 });
 
-router.get("/login", (req, res) => {
+router.get("/signin", (req, res) => {
   res.json({ 
     message: "This endpoint requires POST method. Use Postman to test with POST request.",
     hint: "Send a POST request with JSON body containing email and password"

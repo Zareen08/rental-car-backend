@@ -6,7 +6,7 @@ const createVehicleInDB = async (vehicle: Vehicle) => {
     `
     INSERT INTO vehicles (vehicle_name, type, registration_number, daily_rent_price, availability_status)
     VALUES ($1,$2,$3,$4,$5)
-    RETURNING *
+    RETURNING id, vehicle_name, type, registration_number, daily_rent_price, availability_status
     `,
     [
       vehicle.vehicle_name,
@@ -20,29 +20,58 @@ const createVehicleInDB = async (vehicle: Vehicle) => {
 };
 
 const getAllVehiclesFromDB = async () => {
-  const result = await pool.query(`SELECT * FROM vehicles`);
+  const result = await pool.query(`SELECT id, vehicle_name, type, registration_number, daily_rent_price, availability_status FROM vehicles`);
   return result.rows;
 };
 
 const getVehicleByIdFromDB = async (id: number) => {
-  const result = await pool.query(`SELECT * FROM vehicles WHERE id=$1`, [id]);
+  const result = await pool.query(
+    `SELECT id, vehicle_name, type, registration_number, daily_rent_price, availability_status FROM vehicles WHERE id=$1`,
+    [id]
+  );
   return result.rows[0];
 };
 
 const updateVehicleInDB = async (id: number, data: Partial<Vehicle>) => {
-  const fields = Object.keys(data);
-  const values = Object.values(data);
+  const fields: string[] = [];
+  const values: any[] = [];
+  let idx = 1;
 
-  const setQuery = fields.map((f, i) => `${f}=$${i + 1}`).join(", ");
+  const allowedFields = ['vehicle_name', 'type', 'registration_number', 'daily_rent_price', 'availability_status'];
+  
+  for (const key of allowedFields) {
+    if (data[key as keyof Vehicle] !== undefined) {
+      fields.push(`${key}=$${idx}`);
+      values.push(data[key as keyof Vehicle]);
+      idx++;
+    }
+  }
+
+  if (fields.length === 0) {
+    return null;
+  }
+
   const result = await pool.query(
-    `UPDATE vehicles SET ${setQuery} WHERE id=$${fields.length + 1} RETURNING *`,
+    `UPDATE vehicles SET ${fields.join(", ")} WHERE id=$${idx} RETURNING id, vehicle_name, type, registration_number, daily_rent_price, availability_status`,
     [...values, id]
   );
   return result.rows[0];
 };
 
 const deleteVehicleFromDB = async (id: number) => {
-  const result = await pool.query(`DELETE FROM vehicles WHERE id=$1 RETURNING *`, [id]);
+  const bookingCheck = await pool.query(
+    `SELECT id FROM bookings WHERE vehicle_id = $1 AND status IN ('active', 'confirmed')`,
+    [id]
+  );
+  
+  if (bookingCheck.rows.length > 0) {
+    throw new Error("Cannot delete vehicle with active bookings");
+  }
+
+  const result = await pool.query(
+    `DELETE FROM vehicles WHERE id=$1 RETURNING id`,
+    [id]
+  );
   return result.rows[0];
 };
 

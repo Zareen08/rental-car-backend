@@ -18,7 +18,7 @@ router.get("/me", authenticate, userController.getSingleUser);
 
 router.get("/:userId", authenticate, authorize(Roles.admin), userController.getUserById);
 
-router.put("/:userId", authenticate, authorize(Roles.admin), userController.updateUser);
+router.put("/:userId", authenticate, userController.updateUser);
 
 router.delete("/:userId", authenticate, authorize(Roles.admin), userController.deleteUser);
 
